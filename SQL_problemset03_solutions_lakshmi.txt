@@ -1,0 +1,12 @@
+1)  select title from movie where director='Steven Spielberg';
+2) select title,year from movie where mid in(select mid from rating where stars in(4,5)) order by year;
+3) select title from movie where mid not in(select distinct(mid) from rating);
+4)select name from reviewer where rid in(select rid from rating where ratingdate is null);
+5) select r.name,m.title,rt.stars,rt.ratingdate from rating rt join movie m on m.mid=rt.mid 
+	join reviewer r on rt.rid=r.rid order by r.name,m.title,rt.stars;
+6)select r1.rid,r1.mid,r.name,m.title from rating r1 join rating r2 on r1.rid=r2.rid and r1.mid=r2.mid join movie m on r1.mid=m.mid
+		 join reviewer r on r.rid=r1.rid where r1.stars<r2.stars and r1.ratingdate<r2.ratingdate;
+7)
+10)select distinct(rt.rid),r.name from reviewer r join rating rt on r.rid=rt.rid where rt.mid in(select mid from movie where title='Gone with the Wind');
+13)select title from movie where mid not in(select mid from rating where rid in(select rid from reviewer where name='Chris Jackson'));
+15)select r.name,m.title,rt.stars from rating rt join movie m on rt.mid=m.mid join reviewer r on rt.rid=r.rid where rt.stars in(select min(stars) from rating);

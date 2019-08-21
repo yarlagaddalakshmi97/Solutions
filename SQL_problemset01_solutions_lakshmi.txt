@@ -1,0 +1,16 @@
+1)select * from hotel;
+2) select * from hotel where city='New York';
+3) select * from guest order by guest_city;
+4)select * from room where type='N' order by price;
+5) select count(*) from hotel;
+6) select distinct guest_city from guest;
+7)select avg(price) from room;
+8)select h.name,r.room_no,r.type from room r,hotel h where r.hotel_no=h.hotel_no;
+9) select h.name,b.date_from,b.room_no,h.city from hotel h join booking b on b.hotel_no=h.hotel_no where h.city='New York';
+10)select count(*) from booking where date_from like '%09%';
+11)select guest_name,guest_city from guest join booking on guest.guest_no=booking.guest_no where hotel_no in
+	(select hotel_no from hotel where city='New York') and date_from like '%08%';
+12) select r.hotel_no,r.room_no,h.name from room r join hotel h on h.hotel_no=r.hotel_no where room_no not in(select distinct(room_no) from booking);
+13)
+14)
+15)select avg(price),city from room join hotel on room.hotel_no=hotel.hotel_no group by city;
