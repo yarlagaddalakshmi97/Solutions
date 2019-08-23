@@ -1,5 +1,7 @@
 1)select sum(weight) from picked where plantFK=(select plantid from plant where  name='Corn');
-2)
+2)update picked set locationFK =(select locationid from location where name='North')
+	where locationFK =(select locationid from location where name='South')
+ 	and gardenerFK in(select gardenerid from gardener where name='Erin');
 3)alter table gardener add exper integer(30);
   alter table gardener modify exper varchar(30);
 4) select p.name,pd.seeds from plant p,planted pd where p.plantid=pd.plantFK and seeds<20 and date1='2012-04-14';
@@ -7,5 +9,6 @@
 6)select p.name,sum(seeds) from plant p,planted pd where p.plantid=pd.plantFK group by pd.plantfk,name order by p.name desc;
 7) select pk.amount/pt.seeds from  picked pk join planted pt where pk.plantfk=pt.plantfk group by pk.plantfk;
 8) select g.name,p.name,pk.date1,pk.amount from gardener g join picked pk on g.gardenerid=pk.gardenerfk join plant p on p.plantid=pk.plantfk;
-9)
+9)select name from gardener where  gardenerid in
+	(select distinct pt.gardenerFK from planted pt join picked pk where pk.gardenerFK=pt.gardenerFk and pk.locationFK=pt.locationFK);
 10)create view v1 as select p.name,pk.plantfk from plant p join picked pk on p.plantid=pk.plantfk where pk.date1 like '%08%';

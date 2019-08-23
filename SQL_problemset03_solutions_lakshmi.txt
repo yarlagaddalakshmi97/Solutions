@@ -4,9 +4,33 @@
 4)select name from reviewer where rid in(select rid from rating where ratingdate is null);
 5) select r.name,m.title,rt.stars,rt.ratingdate from rating rt join movie m on m.mid=rt.mid 
 	join reviewer r on rt.rid=r.rid order by r.name,m.title,rt.stars;
-6)select r1.rid,r1.mid,r.name,m.title from rating r1 join rating r2 on r1.rid=r2.rid and r1.mid=r2.mid join movie m on r1.mid=m.mid
+6)select r1.rid,r1.mid,r.name,m.title from rating r1 join rating r2 on r1.rid=r2.rid and r1.mid=r2.mid 
+		join movie m on r1.mid=m.mid
 		 join reviewer r on r.rid=r1.rid where r1.stars<r2.stars and r1.ratingdate<r2.ratingdate;
-7)
-10)select distinct(rt.rid),r.name from reviewer r join rating rt on r.rid=rt.rid where rt.mid in(select mid from movie where title='Gone with the Wind');
-13)select title from movie where mid not in(select mid from rating where rid in(select rid from reviewer where name='Chris Jackson'));
-15)select r.name,m.title,rt.stars from rating rt join movie m on rt.mid=m.mid join reviewer r on rt.rid=r.rid where rt.stars in(select min(stars) from rating);
+7) select m.title,max(stars) from rating r join movie m where m.mid=r.mid group by r.mid order by m.title;
+8) select m.mid,m.title,max(r.stars)-min(r.stars) as difference from rating r join movie m on r.mid=m.mid group by mid order by difference,m.title;
+9)select s3.avg1-s4.avg2 from
+	((select avg(a) as avg1 from (select avg(r.stars) a from rating r join movie m on r.mid=m.mid where m.year<1980 group by m.mid) as s1)
+	as s3, (select avg(b) as  avg2 from(select avg(r.stars) b from rating r join movie m on r.mid=m.mid where m.year>1980 group by m.mid) as s2) s4);
+
+10)select distinct(rt.rid),r.name from reviewer r join rating rt on r.rid=rt.rid where rt.mid in
+	(select mid from movie where title='Gone with the Wind');
+11) select r.name,m.title,rt.stars from movie m join reviewer r on m.director=r.name join rating rt on m.mid=rt.mid and r.rid=rt.rid;
+12) select distinct(r.name),m.title from rating rt join reviewer r on r.rid=rt.rid join movie m on m.mid=rt.mid order by r.name,m.title;
+13)select title from movie where mid not in
+	(select mid from rating where rid in(select rid from reviewer where name='Chris Jackson'));
+14)select distinct r.rid,r.name,rt.mid from rating rt join reviewer r on r.rid=rt.rid order by mid,r.name;
+15)select r.name,m.title,rt.stars from rating rt join movie m on rt.mid=m.mid 
+	join reviewer r on rt.rid=r.rid where rt.stars in(select min(stars) from rating);
+16) select m.title, avg(rt.stars) from rating rt join movie m on rt.mid=m.mid group by rt.mid order by avg(rt.stars),m.title;
+17) select r.name,count(*) from rating rt join reviewer r on r.rid=rt.rid group by rt.rid having count(*)>2;
+18) select m1.title,m2.director from movie m1 join movie m2 on m1.director=m2.director and m1.title<>m2.title order by m2.director,m2.title;
+19)select max(s1.a),s1.title from (select avg(stars) a,rt.mid,m.title from rating rt join movie m on rt.mid=m.mid group by mid order by a desc)as s1;
+20)select s1.title,min(s1.a) from 
+	(select avg(stars) a,rt.mid,m.title from rating rt join movie m on rt.mid=m.mid group by mid order by a asc)as s1;
+
+ select title,avg(stars) from rating r join movie m on r.mid=m.mid group by title having avg(stars) =
+ (select min(s1.a) from (select avg(stars) a,rt.mid,m.title from rating rt join movie m on rt.mid=m.mid group by mid order by a asc)as s1);
+
+21) select m.director,m.title,max(r.stars) from movie m join rating r on m.mid=r.mid where m.director is not null group by m.director having max(stars) in 
+	(select max(stars) from rating r join movie m on m.mid=r.mid group by m.director);

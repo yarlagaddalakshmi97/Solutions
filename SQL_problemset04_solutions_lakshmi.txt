@@ -1,0 +1,14 @@
+1)select id2 from friend where id1 in(select id from highschooler where name='Gabriel');
+2)select h1.name, h1.grade, h2.name, h2.grade from highschooler as h1
+	join likes as l on l.id1 = h1.id join highschooler as h2 on h2.id = l.id2
+	where h2.grade <= h1.grade - 2;
+3)select l1.id1,l2.id2,h1.name,h2.name from likes l1 
+	join likes l2 on l1.id1=l2.id2 and l2.id1=l1.id2 
+	join highschooler h1 on l1.id1=h1.id 
+	join highschooler h2 on l2.id1=h2.id 
+	where h1.name>h2.name order by h1.name;
+4)select id,name,grade from highschooler where id not in
+	(select id1 from likes) or id not in(select id2 from likes) order by grade,name;
+5)
+9) select l.id2,h.name,h.grade,count(*) from likes l join highschooler h on l.id2=h.id group by id2 having count(*)>1;
+12) select sum(s1.count)/count(s1.id2) from (select id2, count(*) as count from friend  group by id2)as s1;
