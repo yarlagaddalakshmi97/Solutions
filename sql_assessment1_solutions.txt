@@ -1,0 +1,159 @@
+Table 1,2 setup
+
+create table employee(emp_id integer,emp_name varchar(30),emp_sal integer,dept_id integer);
+
+insert into employee values(1,'Vivek',8,11000);
+
+insert into employee values(1,'Vivek',2000,1);
+
+insert into employee values(10,'Vivek',2000,1);
+
+insert into employee values(20,'Raj',3000,1);
+
+insert into employee values(30,'Vinoth',4000,1);
+
+insert into employee values(40,'Abhishek',5000,2);
+
+insert into employee values(50,'Divya',6000,2);
+
+insert into employee values(60,'Chitra',7000,3);
+
+create table dept(dept_id integer,dept_name varchar(30));
+
+insert into dept values(1,'IT');
+
+insert into dept values(2,'Admin');
+
+insert into dept values(3,'HR');
+
+
+1)select d.dept_id,d.dept_name,coalesce(sum(e.emp_sal),0) from dept d 
+	left join employee e 
+	on d.dept_id=e.dept_id
+	group by e.dept_id;
+2) select e.dept_id,coalesce(d.dept_name,'Others'),sum(emp_sal) from employee e 
+	left join dept d 
+	on e.dept_id=d.dept_id
+	group by e.dept_id;
+______________________________________________________________________________________
+3,4 Table setup
+ create table employee(emp_id integer,emp_name varchar(30),manager_id integer,salary integer);
+
+insert into employee values(1,'Vivek',8,11000);
+
+insert into employee values(2,'Raj',1,2000);
+
+insert into employee values(3,'Vinoth',1,3000);
+
+insert into employee values(4,'Abhishek',2,5000);
+
+insert into employee values(5,'Divya',3,6000);
+
+insert into employee values(6,'Chitra',3,2350);
+
+insert into employee values(7,'Devi',3,2500);
+
+insert into employee values(8,'Aarthi',4,2700);
+
+
+3)select emp_id,emp_name,manager_id,salary from employee where salary >=2700 and salary<=10000;
+4)select e1.manager_id,e2.emp_name,sum(e1.salary) from employee e1
+	 join employee e2
+	 on e1.manager_id=e2.emp_id
+	 group by e1.manager_id;
+______________________________________________________________________________________
+
+5,6 Table setup
+
+create table employee(emp_id integer,emp_name varchar(30));
+
+insert into employee values(1,'RajeshKumar');
+
+insert into employee values(2,'UdhayaRaja');
+
+insert into employee values(3,'Abhishek');
+
+insert into employee values(4,'MukeshKumar');
+
+insert into employee values(5,'VijayprakashSingh');
+
+insert into employee values(6,'Divyashree');
+
+5)select emp_id,substr(emp_name,4) as derv_emp_name from employee;
+6)select emp_id,substr(emp_name,position('h' IN emp_name)+1,length(emp_name)) as derv_emp_name from employee;
+	select emp_id,substr(emp_name,locate('h',emp_name)+1,length(emp_name)) as derv_emp_name from employee;
+______________________________________________________________________________________
+7,8 Table setup
+create table employee(emp_id integer,emp_name varchar(30),manager_id integer,salary integer);
+insert into employee values(1,'Vivek',8,11000);
+
+insert into employee values(2,'Raj',1,2000);
+
+insert into employee values(3,'Vinoth',1,3000);
+
+insert into employee values(4,'Abhishek',2,5000);
+
+insert into employee values(5,'Divya',3,6000);
+
+insert into employee values(6,'Chitra',3,2350);
+
+insert into employee values(7,'Devi',3,2500);
+
+insert into employee values(8,'Aarthi',4,2700);
+
+
+7) select emp_id,emp_name,max(salary) from employee where salary not in(select max(salary) from employee);
+
+8) select emp_id,emp_name,salary from employee order by salary desc limit 3;
+   select emp_id,emp_name,salary from (select emp_id,emp_name,salary,row_number() over(order by salary desc) as s from employee)as a where s<=3;
+_______________________________________________________________________________________
+9)Table setup
+
+create table employee(emp_id integer,emp_name varchar(30),dept_name varchar(30),salary integer);
+
+insert into employee values(1,'Vivek','IT',2000);
+
+insert into employee values(2,'Raj','Admin',3500);
+
+insert into employee values(3,'Vinoth','HR',4800);
+
+insert into employee values(4,'Abhishek','IT',5700);
+
+insert into employee values(5,'Divya','ITES',3000);
+
+insert into employee values(6,'Chitra','HR',5800);
+
+insert into employee values(7,'Devi','Admin',3200);
+
+9)select emp_id,emp_name,dept_name,salary from employee 
+	where salary>3000 && dept_name='IT' or salary>3400 && dept_name='Admin';
+
+ select emp_id,emp_name,dept_name,salary from(select emp_id,emp_name,dept_name,salary,
+	case when salary>3000 and dept_name='IT'
+     	then salary
+     	when salary>3400 and dept_name='Admin'
+     	then salary
+    	else null
+    	end as sal
+     	from employee)
+    	as A
+     	where sal is not null;
+
+_______________________________________________________________________________________
+10,11,12
+Table setup
+
+create table employee(emp_id integer,emp_name varchar(30),dept_name varchar(30),salary integer);
+
+insert into employee values(1,'Rajesh','IT',2000);
+insert into employee values(2 ,'Ajaykumar','Admin',3500),(3,'Abhishek','HR',4800);
+insert into employee values(4,'Vivekkumar','IT',5700);
+ insert into employee values(5,'Balaji','ITES',3000);
+insert into employee values(6,'Raveendar','HR',5800);
+insert into employee values(7,'Poornarao','Admin',3200);
+
+10)select emp_id,emp_name,dept_name,salary from employee where emp_name like '%J%';
+11)select emp_id,emp_name,dept_name,salary from employee where emp_name 
+	like '%J%' or emp_name like '%N%' or emp_name like '%M%';
+12) select emp_id,emp_name,dept_name,salary from employee where emp_name like '%B%H%E%' ;
+_______________________________________________________________________________________
