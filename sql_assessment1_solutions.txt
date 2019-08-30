@@ -2,10 +2,6 @@ Table 1,2 setup
 
 create table employee(emp_id integer,emp_name varchar(30),emp_sal integer,dept_id integer);
 
-insert into employee values(1,'Vivek',8,11000);
-
-insert into employee values(1,'Vivek',2000,1);
-
 insert into employee values(10,'Vivek',2000,1);
 
 insert into employee values(20,'Raj',3000,1);
@@ -24,13 +20,19 @@ insert into dept values(1,'IT');
 
 insert into dept values(2,'Admin');
 
-insert into dept values(3,'HR');
+insert into dept values(4,'HR');
 
 
 1)select d.dept_id,d.dept_name,coalesce(sum(e.emp_sal),0) from dept d 
 	left join employee e 
 	on d.dept_id=e.dept_id
 	group by e.dept_id;
+
+ select d.dept_id,d.dept_name,sum(case when e.emp_sal is null then 0 else e.emp_sal end)as salary from dept d 
+	left join employee e 
+	on e.dept_id=d.dept_id
+	group by dept_id;
+
 2) select e.dept_id,coalesce(d.dept_name,'Others'),sum(emp_sal) from employee e 
 	left join dept d 
 	on e.dept_id=d.dept_id
@@ -103,6 +105,8 @@ insert into employee values(8,'Aarthi',4,2700);
 
 
 7) select emp_id,emp_name,max(salary) from employee where salary not in(select max(salary) from employee);
+	select emp_id,emp_name,manager_id,salary from(select *,dense_rank() over(order by salary desc) as ranks from employee) as A where ranks=2;
+ 	select * from employee e1 where 1=(select count(distinct e2.salary) from employee e2 where e2.salary>e1.salary);
 
 8) select emp_id,emp_name,salary from employee order by salary desc limit 3;
    select emp_id,emp_name,salary from (select emp_id,emp_name,salary,row_number() over(order by salary desc) as s from employee)as a where s<=3;
