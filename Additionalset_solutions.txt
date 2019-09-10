@@ -1,0 +1,284 @@
+author_publisher_dataset
+________________________
+
+
+create table author(author_id varchar(30),author_name varchar(30),author_country varchar(30),author_city varchar(30),publish_id varchar(30));
+
+insert into author values('AUT001','William Nortan','UK','Cambridge','PB01');
+
+insert into author values('AUT002','C.J.Wilde','USA','San Fransico','PB04');
+
+insert into author values('AUT003','John Betjeman Hunter','RUSSIA','Moscow','PB01');
+
+insert into author values('AUT004','John Betjeman Hunter','CANADA','Toronto','PB03');
+
+insert into author values('AUT005','S.B.Swaminathan','INDIA','Delhi','PB01');
+
+insert into author values('AUT006','Butler Andre','UK','London','PB03');
+
+insert into author values('AUT007','E.Howard','EUROPE','Berlin','PB03');
+
+insert into author values('AUT008','Andrew jeff','GERMANY','Berlin','PB02');
+
+insert into author values('AUT009','Drek Tailor','Australia','melbourne','PB01');
+
+insert into author values('AUT010','Mary Coffing','USA','New Jersy','PB04');
+
+
+create table publisher(publish_id varchar(30),publish_name varchar(30),publish_city varchar(30),publish_start_date date,branches integer);
+
+insert into publisher values('PB01','Jex Max Publication','Berlin','1929/04/21',10);
+
+insert into publisher values('PB02','Summer Night Publication','Canada','2019/08/31',25);
+
+insert into publisher values('PB03','Novel Publisher Ltd','London','2018/08/10',11);
+
+insert into publisher values('PB04','Mark Book sales','New Jersy','2008/05/24',9);
+
+
+1)select p.publish_id,p.publish_name,a.author_city as correct_publish_city,p.publish_start_date,p.branches from publisher p 
+	join author a  
+	on p.publish_id=a.publish_id
+	where p.publish_city<>a.author_city
+	and p.publish_city=a.author_country;
+
+2)select author_name,author_country,author_city,branches
+	from(select a.author_name,a.author_country,a.author_city,p.branches,
+		dense_rank() over(partition by round(year(publish_start_date)/100+1) order by branches desc )as ranks 
+		from publisher p inner join author a 
+		on a.publish_id=p.publish_id)as A
+	 where ranks=1;
+3)select p.publish_id,p.publish_name,p.publish_city,p.publish_start_date,p.branches,
+	a.author_name,a.author_country,a.author_city
+	from 
+	author a inner join publisher p
+	on a.publish_id=p.publish_id where a.author_country in
+	(select a.author_country
+	from 
+	author a inner join publisher p
+	on a.publish_id=p.publish_id
+	and p.publish_city=a.author_city);
+	
+
+select
+p2.publish_id,p2.publish_name,p2.publish_city,p2.publish_start_date,p2.branches,
+a1.author_name,a1.author_country,a1.author_city
+from 
+author a1 inner join author a2 
+on a1.author_country=a2.author_country
+inner join publisher p
+on a2.publish_id=p.publish_id
+join publisher p2
+on p2.publish_id=a1.publish_id
+where p.publish_city=a2.author_city;
+
+4)
+	select a2.author_id,a2.author_name,a2.author_country,a2.author_city,a2.publish_id,
+	case when a2.author_country='EUROPE' and a2.author_city='Berlin' then 'incorrect country name' else 'correct country name' end as status	
+	from author a1 join author a2 on  a1.author_city=a2.author_city and a1.author_country<>a2.author_country;
+
+
+5) select a2.author_name from
+ author a1 inner join publisher p1
+on a1.publish_id=p1.publish_id
+and a1.author_city=p1.publish_city
+join author a2 
+a1.author_country=a2.author_country;  
+
+
+6)select a.author_id,a.author_name,a.author_country,a.author_city,a.publish_id
+	from author a join publisher p
+	on a.publish_id=p.publish_id and substr(a.author_name,1,1)=substr(p.publish_name,1,1);
+7)select author_id,author_name,author_country,author_city,publish_id
+	from author
+	where author_name like '_._.%';
+
+8)select author_id,author_name,author_country,author_city,publish_id
+	from author
+	where author_name not like '_.%';
+
+9)select * from author where ascii(lower(substr(author_country,2)))=ascii(substr(author_country,2));
+
+
+10)select a.author_id,a.author_name,a.author_country,a.author_city,a.publish_id,
+	p.publish_id,p.publish_name,p.publish_city,p.publish_start_date,p.branches,
+	max(p.publish_start_date) as latest_date
+	from author a join publisher p on a.publish_id=p.publish_id;
+11)
+
+
+____________________________________________________________________________
+
+trip_data_set
+
+
+create table trip(trip_id varchar(30),trip_source varchar(30),trip_destination varchar(30),trip_start_time time,
+     trip_end_time time,trip_cost integer,dynamic_fare varchar(1));
+
+insert into trip values('TP01','CHN','BGL','13:40','15:40',3500,'Y');
+
+insert into trip values('TP02','BGL','MUM','18:20','19:20',6700,'Y');
+
+insert into trip values('TP03','CHN','HYD','9:45','11:10',3000,'Y');
+
+insert into trip values('TP04','HYD','BGL','12:20','13:25',2700,'N');
+
+insert into trip values('TP05','MUM','NDL','23:00','01:25',4500,'Y');
+
+insert into trip values('TP06','BGL','NDL','19:40','22:10',5000,'N');
+
+insert into trip values('TP07','NDL','MUM','16:45','17:50',6000,'Y');
+
+insert into trip values('TP08','MUM','BGL','20:20','23:45',5000,'N');
+
+insert into trip values('TP09','NDL','HYD','11:25','13:45',3000,'N');
+
+insert into trip values('TP10','HYD','CHN','20:30','22:20',4500,'Y');
+
+insert into trip values('TP11','BGL','CHN','23:45','01:05',3900,'Y');
+
+1)
+select * from
+	(select t1.trip_source as t1_source,
+	t1.trip_destination as t1_destination,
+	t2.trip_source as t2_source,
+	t2.trip_destination as t2_destination,
+	t3.trip_source t3_source,
+	t3.trip_destination t3_destination,
+	t1.trip_cost+t2.trip_cost+t3.trip_cost as trip_cost,dense_rank() over(order by t1.trip_cost+t2.trip_cost+t3.trip_cost) as ranks 
+	from trip t1 join trip t2
+	on t1.trip_destination=t2.trip_source
+	join trip t3
+	on t2.trip_destination=t3.trip_source
+	where t1.trip_source='CHN' and  t3.trip_destination='NDL') A 
+where ranks=1;
+
+
+
+2)
+select t1.trip_source as t1_source,
+	t1.trip_destination as t1_destination,
+	t2.trip_source as t2_source,
+	t2.trip_destination as t2_destination,
+	t3.trip_source t3_source,
+	t3.trip_destination t3_destination, 
+
+	case when t1.trip_start_time like '2%' and t1.trip_end_time like '0%' 
+	then timediff(t1.trip_start_time-12,t1.trip_end_time) else timediff(t1.trip_start_time,t1.trip_end_time) end as t1_timediff,
+
+	case when t2.trip_start_time like '2%' and t2.trip_end_time like '0%' 
+	then timediff(t2.trip_start_time-12,t2.trip_end_time) else timediff(t2.trip_start_time,t2.trip_end_time) end as t2_timediff,	
+	
+	case when t3.trip_start_time like '2%' and t1.trip_end_time like '0%' 
+	then timediff(t3.trip_start_time-12,t3.trip_end_time) else timediff(t3.trip_start_time,t3.trip_end_time) end as t3_timediff
+		
+	from trip t1 join trip t2
+	on t1.trip_destination=t2.trip_source
+	join trip t3
+	on t2.trip_destination=t3.trip_source
+	where t1.trip_source='CHN' and  t3.trip_destination='NDL';
+
+	
+
+
+
+
+
+
+
+
+	select t1.trip_source as t1_source,
+	t1.trip_destination as t1_destination,
+	t2.trip_source as t2_source,
+	t2.trip_destination as t2_destination,
+	t3.trip_source t3_source,
+	t3.trip_destination t3_destination, 
+	timediff(t1.trip_end_time,t1.trip_start_time)+
+	timediff(t2.trip_end_time,t2.trip_start_time)+
+	timediff(t3.trip_end_time,t3.trip_start_time) as trip_time,
+
+	dense_rank() over
+	(order by timediff(t1.trip_end_time,t1.trip_start_time)+timediff(t2.trip_end_time,t2.trip_start_time)+timediff(t3.trip_end_time,t3.trip_start_time)) as ranks 
+		
+	from trip t1 join trip t2
+	on t1.trip_destination=t2.trip_source
+	join trip t3
+	on t2.trip_destination=t3.trip_source
+	where t1.trip_source='CHN' and  t3.trip_destination='NDL';
+
+	
+
+
+
+3)
+
+8)
+select t1.trip_source,t1.trip_destination,t2.trip_source,t2.trip_destination,t1.trip_cost+t2.trip_cost 
+from
+trip t1 join trip t2
+on t1.trip_destination=t2.trip_source
+where t1.trip_source='NDL' and  t2.trip_destination='CHN';
+
+9)select trip_source,trip_destination,trip_start_time,trip_end_time,trip_cost,dynamic_fare 
+	from(select trip_source,trip_destination,trip_start_time,trip_end_time,trip_cost,dynamic_fare,
+	dense_rank() over(order by timediff(trip_end_time,trip_start_time)) as ranks from trip)as A 
+	where ranks=1;
+10)select trip_source,trip_destination,trip_start_time,trip_end_time,trip_cost,dynamic_fare 
+	from(select trip_source,trip_destination,trip_start_time,trip_end_time,trip_cost,dynamic_fare,
+	dense_rank() over(order by timediff(trip_end_time,trip_start_time) desc) as ranks from trip where dynamic_fare='N')as A 
+	where ranks=1;
+
+______________________________________________________________________________________________________________________
+Rainfall_Data_Set
+
+create table stats(Stats_ID integer,MONTH integer,YEAR year,TEMP_FARENHEIT float,RAIN_INCH float);
+
+insert into stats values(13,1,'2010',57.4,0.31);
+
+insert into stats values(13,5,'2010',91.7,5.15);
+
+insert into stats values(13,12,'2010',12.6,8.34);
+
+insert into stats values(13,9,'2010',100.3,10.34);
+
+insert into stats values(44,9,'2010',27.2,3.45);
+
+insert into stats values(44,2,'2010',27.3,0.18);
+
+insert into stats values(44,6,'2010',74.8,2.11);
+
+insert into stats values(66,3,'2010',6.7,2.1);
+
+insert into stats values(66,7,'2010',65.8,4.52);
+
+
+create table Station(Station_ID integer,CITY varchar(30),STATE varchar(10),LAT_N integer,LONG_W integer);
+
+insert into Station values(13,'Phoenix','AZ',33,112);
+
+insert into Station values(44,'Denever','CO',40,105);
+
+insert into Station values(66,'Caribou','ME',47,68);
+
+
+1)select * from(select Stats_ID,st.city,s.MONTH,YEAR,s.TEMP_FARENHEIT,s.RAIN_INCH,
+	dense_rank() over (partition by s.Stats_ID order by s.TEMP_FARENHEIT desc,s.RAIN_INCH desc) ranks
+	from stats s join station st
+	on s.Stats_ID=st.Station_ID) A
+where ranks=1;
+
+2)select st.Station_ID,st.CITY,st.STATE,s.MONTH,s.YEAR,round((s.TEMP_FARENHEIT-32)*5/9,3) AS TEMP_CEL,round(s.RAIN_INCH*0.3937,3) AS RAIN_CMS
+ 	from stats s join station st 
+	on s.Stats_ID=st.Station_ID;
+	
+3)
+
+
+
+4)select stats_id,month,year from stats having temp_farenheit<avg(temp_farenheit) and rain_inch>avg(rain_inch) ;
+
+9)select st.Station_ID,st.CITY,st.STATE,s.MONTH,s.YEAR,round((s.TEMP_FARENHEIT-32)*5/9,3) AS TEMP_CEL
+ 	from stats s join station st 
+	on s.Stats_ID=st.Station_ID having temp_cel<0;
+
+10)select Stats_ID,MONTH,YEAR,TEMP_FARENHEIT,RAIN_INCH from stats having RAIN_INCH>(select avg(RAIN_INCH) from stats) ;
